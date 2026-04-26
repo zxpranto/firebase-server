@@ -118,6 +118,19 @@ app.get("/test-notification", async (req, res) => {
   res.send("Notification Sent");
 });
 
+app.post("/new-order", async (req, res) => {
+  const order = req.body;
+
+  console.log("🆕 New Order:", order.id);
+
+  await sendNotification(
+    "🛒 New Order!",
+    `Order #${order.id} received`
+  );
+
+  res.sendStatus(200);
+});
+
 /*
 ========================================
 🔥 PATHAO CONFIG
