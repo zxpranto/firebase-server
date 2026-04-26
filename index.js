@@ -103,11 +103,32 @@ async function sendNotification(title, body) {
 
     console.log("🔔 Sent:", response.successCount);
 
+    // 🔥 INVALID TOKEN FIND
+    const invalidTokens = [];
+
+    response.responses.forEach((resp, index) => {
+      if (!resp.success) {
+        const errorCode = resp.error?.code;
+
+        if (
+          errorCode === "messaging/invalid-registration-token" ||
+          errorCode === "messaging/registration-token-not-registered"
+        ) {
+          invalidTokens.push(tokens[index]);
+        }
+      }
+    });
+
+    // 🔥 DELETE FROM DB
+    if (invalidTokens.length > 0) {
+      await Token.deleteMany({ token: { $in: invalidTokens } });
+      console.log("🧹 Removed invalid tokens:", invalidTokens.length);
+    }
+
   } catch (error) {
     console.log("❌ Notification Error:", error);
   }
 }
-
 /*
 ========================================
 🧪 TEST NOTIFICATION
